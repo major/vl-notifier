@@ -1,0 +1,17 @@
+{
+  "name": "vl-notifier",
+  "version": "1.0.0",
+  "description": "Browser extension for VolumeLeaders notifications",
+  "scripts": {
+    "lint": "web-ext lint --source-dir firefox",
+    "lint:chrome": "echo 'Chrome lint not available via web-ext'",
+    "build": "web-ext build --source-dir firefox --overwrite-dest",
+    "build:chrome": "mkdir -p web-ext-artifacts && cd chrome && zip -r ../web-ext-artifacts/vl-notifier-chrome.zip .",
+    "build:all": "npm run build && npm run build:chrome",
+    "start": "web-ext run --source-dir firefox",
+    "sign": "web-ext sign --source-dir firefox"
+  },
+  "devDependencies": {
+    "web-ext": "^9.2.0"
+  }
+}

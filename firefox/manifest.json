@@ -1,0 +1,38 @@
+{
+  "manifest_version": 2,
+  "name": "VL Notifier",
+  "version": "1.0.0",
+  "description": "Notifies when new Trade Level Touches or Block Trades appear on VolumeLeaders",
+  "permissions": [
+    "webRequest",
+    "webRequestBlocking",
+    "webNavigation",
+    "*://www.volumeleaders.com/*",
+    "storage",
+    "notifications",
+    "tabs"
+  ],
+  "background": {
+    "scripts": [
+      "background.js"
+    ]
+  },
+  "browser_action": {
+    "default_icon": {
+      "48": "icons/icon-48.png",
+      "96": "icons/icon-96.png"
+    },
+    "default_title": "VL Notifier Settings",
+    "default_popup": "popup/popup.html"
+  },
+  "icons": {
+    "48": "icons/icon-48.png",
+    "96": "icons/icon-96.png"
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "vl-notifier@local",
+      "strict_min_version": "91.0"
+    }
+  }
+}
