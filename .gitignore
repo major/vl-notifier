@@ -1,0 +1,20 @@
+# Extension build artifacts
+*.zip
+*.xpi
+web-ext-artifacts/
+
+# Node
+node_modules/
+package-lock.json
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor/IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.claude

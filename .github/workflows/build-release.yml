@@ -1,0 +1,92 @@
+name: Build and Release
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Get version from manifest
+        id: version
+        run: |
+          VERSION=$(jq -r '.version' firefox/manifest.json)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Create Firefox extension zip
+        run: |
+          cd firefox && zip -r ../vl-notifier-firefox-${{ steps.version.outputs.version }}.zip \
+            manifest.json \
+            background.js \
+            icons/ \
+            popup/
+
+      - name: Create Chrome extension zip
+        run: |
+          cd chrome && zip -r ../vl-notifier-chrome-${{ steps.version.outputs.version }}.zip \
+            manifest.json \
+            service-worker.js \
+            content-script.js \
+            injected-script.js \
+            offscreen.html \
+            offscreen.js \
+            icons/ \
+            popup/
+
+      - name: Upload Firefox artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: vl-notifier-firefox-${{ steps.version.outputs.version }}
+          path: vl-notifier-firefox-${{ steps.version.outputs.version }}.zip
+
+      - name: Upload Chrome artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: vl-notifier-chrome-${{ steps.version.outputs.version }}
+          path: vl-notifier-chrome-${{ steps.version.outputs.version }}.zip
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Get version from manifest
+        id: version
+        run: |
+          VERSION=$(jq -r '.version' firefox/manifest.json)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Download Firefox artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: vl-notifier-firefox-${{ steps.version.outputs.version }}
+
+      - name: Download Chrome artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: vl-notifier-chrome-${{ steps.version.outputs.version }}
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            vl-notifier-firefox-${{ steps.version.outputs.version }}.zip
+            vl-notifier-chrome-${{ steps.version.outputs.version }}.zip
+          generate_release_notes: true
+          draft: false
+          prerelease: false

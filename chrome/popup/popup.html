@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-size: 14px;
+      padding: 16px;
+      margin: 0;
+      min-width: 280px;
+      background: #f9f9f9;
+    }
+
+    h1 {
+      font-size: 16px;
+      margin: 0 0 16px 0;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #ddd;
+      color: #333;
+    }
+
+    .setting {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid #eee;
+    }
+
+    .setting:last-child {
+      border-bottom: none;
+    }
+
+    .setting-label {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .setting-name {
+      font-weight: 500;
+      color: #333;
+    }
+
+    .setting-desc {
+      font-size: 12px;
+      color: #666;
+    }
+
+    /* Toggle switch */
+    .toggle {
+      position: relative;
+      width: 44px;
+      height: 24px;
+      flex-shrink: 0;
+    }
+
+    .toggle input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: 0.2s;
+      border-radius: 24px;
+    }
+
+    .toggle-slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: 0.2s;
+      border-radius: 50%;
+    }
+
+    input:checked + .toggle-slider {
+      background-color: #4CAF50;
+    }
+
+    input:checked + .toggle-slider:before {
+      transform: translateX(20px);
+    }
+
+    .test-btn {
+      margin-top: 16px;
+      padding: 8px 16px;
+      background: #2196F3;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 13px;
+      width: 100%;
+    }
+
+    .test-btn:hover {
+      background: #1976D2;
+    }
+
+    .status {
+      margin-top: 8px;
+      font-size: 12px;
+      color: #666;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <h1>🔔 VL Notifier</h1>
+
+  <div class="setting">
+    <div class="setting-label">
+      <span class="setting-name">Play Sound</span>
+      <span class="setting-desc">Audio alert for new touches</span>
+    </div>
+    <label class="toggle">
+      <input type="checkbox" id="playSound">
+      <span class="toggle-slider"></span>
+    </label>
+  </div>
+
+  <div class="setting">
+    <div class="setting-label">
+      <span class="setting-name">Persistent Notifications</span>
+      <span class="setting-desc">Stay until dismissed</span>
+    </div>
+    <label class="toggle">
+      <input type="checkbox" id="persistentNotifications">
+      <span class="toggle-slider"></span>
+    </label>
+  </div>
+
+  <button class="test-btn" id="testBtn">Test Notification</button>
+  <div class="status" id="status"></div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
