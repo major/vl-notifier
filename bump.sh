@@ -67,3 +67,11 @@ fi
 echo "  → package.json (${PACKAGE_VERSION})"
 jq --arg v "$PACKAGE_VERSION" '.version = $v' package.json > package.json.tmp
 mv package.json.tmp package.json
+
+echo -e "\n${GREEN}🏷️  Creating tag v${VERSION}${NC}"
+git tag "v${VERSION}"
+
+echo -e "\n${GREEN}✅ Done!${NC}"
+echo -e "\nTo publish the release, run:"
+echo -e "  ${YELLOW}git push origin v${VERSION}${NC}"
+echo -e "\nGitHub Actions will automatically create the release."

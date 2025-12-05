@@ -122,7 +122,7 @@ const PAGE_HANDLERS = {
       const sectorParts = [item.Sector];
       if (item.Industry) sectorParts.push(item.Industry);
       return {
-        title: `🔔 ${item.Ticker}${rank} touched ${formatPrice(item.Price)}`,
+        title: `[VL] 🔔 ${item.Ticker}${rank} touched ${formatPrice(item.Price)}`,
         message: `${daysStr}RS ${rs}x | PCT ${pct}\n${sectorParts.join(' | ')}`
       };
     }
@@ -144,7 +144,7 @@ const PAGE_HANDLERS = {
       const sectorParts = [item.Sector];
       if (item.Industry) sectorParts.push(item.Industry);
       return {
-        title: `💰 ${item.Ticker} ${rank}${tradeType} ${formatPrice(item.Price)}`,
+        title: `[VL] 💰 ${item.Ticker} ${rank}${tradeType} ${formatPrice(item.Price)}`,
         message: `RS ${rs}x | PCT ${pct}\n${shares} sh | ${dollars}\n${sectorParts.join(' | ')}`
       };
     }
@@ -477,7 +477,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       await chrome.notifications.create(`vl-test-${Date.now()}`, {
         type: "basic",
         iconUrl: "https://www.volumeleaders.com/favicon.png",
-        title: "🔔 Test Notification",
+        title: "[VL] 🔔 Test Notification",
         message: "VL Notifier is working!",
         requireInteraction: settings.persistentNotifications
       });

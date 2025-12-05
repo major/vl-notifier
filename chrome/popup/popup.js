@@ -80,7 +80,7 @@ async function testNotification() {
   const notificationOptions = {
     type: "basic",
     iconUrl: "https://www.volumeleaders.com/favicon.png",
-    title: "\u{1F514} TEST touched $123.45",
+    title: "[VL] \u{1F514} TEST touched $123.45",
     message: "Rank 1 | Technology | RS: 2.50"
   };
 
