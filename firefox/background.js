@@ -94,6 +94,16 @@ function getTradeTypeSymbol(darkPool, sweep) {
   return sweep ? '🔷' : '🔵';
 }
 
+/**
+ * Check if response is from a single-ticker filtered request.
+ * Single-ticker requests (e.g., from chart pages) return items with Ticker: null
+ * since the ticker is implied by the request context.
+ */
+function isSingleTickerResponse(items) {
+  if (!items || items.length === 0) return false;
+  return items.every(item => item.Ticker === null);
+}
+
 const PAGE_HANDLERS = {
   tradeLevelTouches: {
     name: "Trade Level Touches",
@@ -284,6 +294,12 @@ async function processResponse(responseText, handler) {
   }
 
   const items = data.data;
+
+  // Skip single-ticker responses (e.g., from chart pages)
+  if (handler.storagePrefix === 'seenTouches' && isSingleTickerResponse(items)) {
+    console.log(`[VL Notifier] Skipping single-ticker response (${items.length} items)`);
+    return;
+  }
 
   // Acquire lock to prevent race conditions with concurrent XHR responses
   // This ensures storage read-modify-write is atomic per handler

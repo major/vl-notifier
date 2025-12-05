@@ -1,5 +1,7 @@
 # VL Notifier
 
+> These extensions are **totally unofficial** and not affiliated with VolumeLeaders.com.
+
 Browser extensions that monitor [VolumeLeaders.com](https://www.volumeleaders.com) and send desktop notifications when new Trade Level Touches or Block Trades appear.
 
 | Browser | Status | Manifest | Directory |
