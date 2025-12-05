@@ -1,6 +1,6 @@
 {
   "name": "vl-notifier",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Browser extension for VolumeLeaders notifications",
   "scripts": {
     "lint": "web-ext lint --source-dir firefox",

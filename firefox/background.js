@@ -189,7 +189,6 @@ async function acquireLock(handlerKey) {
 /** Default settings */
 const DEFAULT_SETTINGS = {
   playSound: false,
-  persistentNotifications: false,
   soundFrequency: 800,
   soundDuration: 150
 };
@@ -256,9 +255,6 @@ async function showNotification(item, handler) {
       title: formatted.title,
       message: formatted.message
     };
-
-    // Note: Firefox doesn't support requireInteraction - notifications auto-dismiss
-    // The setting only affects Chrome
 
     await browser.notifications.create(notificationId, notificationOptions);
 

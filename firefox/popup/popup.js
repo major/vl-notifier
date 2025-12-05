@@ -5,13 +5,11 @@
 
 const DEFAULT_SETTINGS = {
   playSound: false,
-  persistentNotifications: false,
   soundFrequency: 800,
   soundDuration: 150
 };
 
 const playSoundEl = document.getElementById("playSound");
-const persistentEl = document.getElementById("persistentNotifications");
 const testBtn = document.getElementById("testBtn");
 const statusEl = document.getElementById("status");
 
@@ -23,7 +21,6 @@ async function loadSettings() {
   const settings = { ...DEFAULT_SETTINGS, ...stored.settings };
 
   playSoundEl.checked = settings.playSound;
-  persistentEl.checked = settings.persistentNotifications;
 }
 
 /**
@@ -32,7 +29,6 @@ async function loadSettings() {
 async function saveSettings() {
   const settings = {
     playSound: playSoundEl.checked,
-    persistentNotifications: persistentEl.checked,
     soundFrequency: DEFAULT_SETTINGS.soundFrequency,
     soundDuration: DEFAULT_SETTINGS.soundDuration
   };
@@ -87,8 +83,6 @@ async function testNotification() {
     message: "Rank 1 | Technology | RS: 2.50"
   };
 
-  // Note: Firefox doesn't support requireInteraction - setting ignored here
-
   await browser.notifications.create(`test-${Date.now()}`, notificationOptions);
 
   if (playSoundEl.checked) {
@@ -100,7 +94,6 @@ async function testNotification() {
 
 // Event listeners
 playSoundEl.addEventListener("change", saveSettings);
-persistentEl.addEventListener("change", saveSettings);
 testBtn.addEventListener("click", testNotification);
 
 // Initialize
