@@ -104,6 +104,16 @@ function isSingleTickerResponse(items) {
   return items.every(item => item.Ticker === null);
 }
 
+/**
+ * Check if a tab URL is a chart page (where we don't want notifications)
+ * @param {string} url - The tab URL
+ * @returns {boolean} True if the URL is a chart page
+ */
+function isChartPage(url) {
+  if (!url) return false;
+  return /volumeleaders\.com\/Chart/i.test(url);
+}
+
 const PAGE_HANDLERS = {
   tradeLevelTouches: {
     name: "Trade Level Touches",
@@ -462,6 +472,14 @@ chrome.tabs.onActivated.addListener(async (activeInfo) => {
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === 'API_RESPONSE') {
+    // Skip processing if request came from a chart page
+    // Chart pages make filtered API calls that would spam notifications
+    if (sender.tab && isChartPage(sender.tab.url)) {
+      const handler = findHandlerForUrl(message.url);
+      console.log(`[VL Notifier] Skipping ${handler?.name || 'unknown'} - request from chart page`);
+      return false;
+    }
+
     const handler = findHandlerForUrl(message.url);
     if (handler) {
       processResponse(message.responseText, handler).catch(err => {

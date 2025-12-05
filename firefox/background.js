@@ -411,16 +411,41 @@ function findHandlerForUrl(url) {
 }
 
 /**
+ * Check if a tab URL is a chart page (where we don't want notifications)
+ * @param {string} url - The tab URL
+ * @returns {boolean} True if the URL is a chart page
+ */
+function isChartPage(url) {
+  if (!url) return false;
+  return /volumeleaders\.com\/Chart/i.test(url);
+}
+
+/**
  * Set up the XHR interceptor using webRequest.filterResponseData
  * Monitors all registered URL patterns
  */
 browser.webRequest.onBeforeRequest.addListener(
-  (details) => {
+  async (details) => {
     // Find the matching handler for this URL
     const handler = findHandlerForUrl(details.url);
     if (!handler) {
       console.warn(`[VL Notifier] No handler found for URL: ${details.url}`);
       return {};
+    }
+
+    // Check if request is from a chart page - skip notifications there
+    // Chart pages make filtered API calls that would spam notifications
+    let skipProcessing = false;
+    if (details.tabId && details.tabId >= 0) {
+      try {
+        const tab = await browser.tabs.get(details.tabId);
+        if (isChartPage(tab.url)) {
+          console.log(`[VL Notifier] Skipping ${handler.name} - request from chart page`);
+          skipProcessing = true;
+        }
+      } catch (e) {
+        // Tab might not exist anymore, continue normally
+      }
     }
 
     const filter = browser.webRequest.filterResponseData(details.requestId);
@@ -438,10 +463,12 @@ browser.webRequest.onBeforeRequest.addListener(
       // Finish decoding any remaining data
       responseData += decoder.decode();
 
-      // Process the complete response (async, don't block)
-      processResponse(responseData, handler).catch(err => {
-        console.error(`[VL Notifier] Error processing response (${handler.name}):`, err);
-      });
+      // Process the complete response (async, don't block) - unless from chart page
+      if (!skipProcessing) {
+        processResponse(responseData, handler).catch(err => {
+          console.error(`[VL Notifier] Error processing response (${handler.name}):`, err);
+        });
+      }
 
       filter.close();
     };
