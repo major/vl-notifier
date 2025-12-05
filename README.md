@@ -126,15 +126,26 @@ openssl genrsa -out chrome.pem 2048
 
 ## Releasing a New Version
 
-```bash
-# Bump version, commit, and create tag
-make release VERSION=1.3
+Uses [release-it](https://github.com/release-it/release-it) to automate version bumping, tagging, and pushing:
 
-# Push the tag to trigger GitHub Actions release
-git push origin v1.3
+```bash
+npm run release           # Interactive (prompts for version type)
+npm run release:patch     # 1.0.7 -> 1.0.8
+npm run release:minor     # 1.0.7 -> 1.1.0
+npm run release:major     # 1.0.7 -> 2.0.0
+
+# Preview without making changes
+npx release-it --dry-run
 ```
 
-This automatically updates `firefox/manifest.json`, `chrome/manifest.json`, and `package.json`, then creates a git tag. GitHub Actions builds and publishes the release.
+This automatically:
+1. Runs lint check
+2. Bumps version in `package.json`, `firefox/manifest.json`, and `chrome/manifest.json`
+3. Commits with message `chore: release vX.X.X`
+4. Creates git tag `vX.X.X`
+5. Pushes to GitHub
+
+GitHub Actions then builds the extensions, signs the Firefox XPI, and creates the release with all artifacts.
 
 ## License
 

@@ -1,0 +1,28 @@
+{
+  "git": {
+    "commitMessage": "chore: release v${version}",
+    "tagName": "v${version}",
+    "tagAnnotation": "Release v${version}",
+    "push": true,
+    "requireCleanWorkingDir": true
+  },
+  "github": {
+    "release": false
+  },
+  "npm": {
+    "publish": false
+  },
+  "plugins": {
+    "@release-it/bumper": {
+      "out": [
+        { "file": "package.json", "path": "version" },
+        { "file": "firefox/manifest.json", "path": "version" },
+        { "file": "chrome/manifest.json", "path": "version" }
+      ]
+    }
+  },
+  "hooks": {
+    "before:init": ["npm run lint"],
+    "after:bump": ["echo 'Version bumped to ${version}'"]
+  }
+}

@@ -9,9 +9,15 @@
     "build:chrome": "mkdir -p web-ext-artifacts && cd chrome && zip -r ../web-ext-artifacts/vl-notifier-chrome.zip .",
     "build:all": "npm run build && npm run build:chrome",
     "start": "web-ext run --source-dir firefox",
-    "sign": "web-ext sign --source-dir firefox"
+    "sign": "web-ext sign --source-dir firefox",
+    "release": "release-it",
+    "release:patch": "release-it patch",
+    "release:minor": "release-it minor",
+    "release:major": "release-it major"
   },
   "devDependencies": {
+    "@release-it/bumper": "^7.0.5",
+    "release-it": "^19.0.6",
     "web-ext": "^9.2.0"
   }
 }

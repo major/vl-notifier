@@ -16,6 +16,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install web-ext
+        run: npm install -g web-ext
+
       - name: Get version from manifest
         id: version
         run: |
@@ -27,8 +35,22 @@ jobs:
           cd firefox && zip -r ../vl-notifier-firefox-${{ steps.version.outputs.version }}.zip \
             manifest.json \
             background.js \
+            shared/ \
             icons/ \
             popup/
+
+      - name: Sign Firefox extension
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          WEB_EXT_API_KEY: ${{ secrets.FIREFOX_API_KEY }}
+          WEB_EXT_API_SECRET: ${{ secrets.FIREFOX_API_SECRET }}
+        run: |
+          web-ext sign \
+            --source-dir firefox \
+            --artifacts-dir web-ext-artifacts \
+            --channel=unlisted
+          # Rename to consistent naming
+          mv web-ext-artifacts/*.xpi vl-notifier-firefox-${{ steps.version.outputs.version }}.xpi
 
       - name: Create Chrome extension zip
         run: |
@@ -39,14 +61,22 @@ jobs:
             injected-script.js \
             offscreen.html \
             offscreen.js \
+            shared/ \
             icons/ \
             popup/
 
-      - name: Upload Firefox artifact
+      - name: Upload Firefox zip artifact
         uses: actions/upload-artifact@v4
         with:
           name: vl-notifier-firefox-${{ steps.version.outputs.version }}
           path: vl-notifier-firefox-${{ steps.version.outputs.version }}.zip
+
+      - name: Upload Firefox signed XPI artifact
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: actions/upload-artifact@v4
+        with:
+          name: vl-notifier-firefox-${{ steps.version.outputs.version }}-signed
+          path: vl-notifier-firefox-${{ steps.version.outputs.version }}.xpi
 
       - name: Upload Chrome artifact
         uses: actions/upload-artifact@v4
@@ -72,10 +102,15 @@ jobs:
           VERSION=$(jq -r '.version' firefox/manifest.json)
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
-      - name: Download Firefox artifact
+      - name: Download Firefox zip artifact
         uses: actions/download-artifact@v4
         with:
           name: vl-notifier-firefox-${{ steps.version.outputs.version }}
+
+      - name: Download Firefox signed XPI artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: vl-notifier-firefox-${{ steps.version.outputs.version }}-signed
 
       - name: Download Chrome artifact
         uses: actions/download-artifact@v4
@@ -87,6 +122,7 @@ jobs:
         with:
           files: |
             vl-notifier-firefox-${{ steps.version.outputs.version }}.zip
+            vl-notifier-firefox-${{ steps.version.outputs.version }}.xpi
             vl-notifier-chrome-${{ steps.version.outputs.version }}.zip
           generate_release_notes: true
           draft: false

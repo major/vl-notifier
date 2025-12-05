@@ -11,9 +11,15 @@ Browser extension (Firefox MV2 + Chrome MV3) that monitors VolumeLeaders.com API
 ./build.sh --sign-chrome # Sign Chrome .crx (requires private key)
 npm run start           # Dev: hot reload Firefox
 npm run lint            # Lint Firefox
+
+# Releases (via release-it)
+npm run release         # Interactive release
+npm run release:patch   # Bump patch version
+npm run release:minor   # Bump minor version
+npm run release:major   # Bump major version
 ```
 
-**Release:** Bump version in `firefox/manifest.json` + `chrome/manifest.json`, tag + push → GitHub Actions builds release
+**Release:** `npm run release:patch` bumps version in all manifests, commits, tags, pushes → GitHub Actions builds + signs + publishes
 
 ## Architecture
 
