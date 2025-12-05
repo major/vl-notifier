@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "VL Notifier",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Notifies when new Trade Level Touches or Block Trades appear on VolumeLeaders",
   "permissions": [
     "webRequest",
@@ -35,7 +35,9 @@
       "id": "vl-notifier@local",
       "strict_min_version": "91.0",
       "data_collection_permissions": {
-        "user_data_collection": false
+        "required": [
+          "none"
+        ]
       }
     }
   }
