@@ -1,0 +1,21 @@
+{
+    "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+    "extends": [
+        "config:recommended",
+        ":automergeAll",
+        "config:best-practices"
+    ],
+    "platformAutomerge": true,
+    "minimumReleaseAge": "3 days",
+    "git-submodules": {
+        "enabled": true
+    },
+    "packageRules": [
+        {
+            "matchManagers": [
+                "github-actions"
+            ],
+            "automerge": true
+        }
+    ]
+}
