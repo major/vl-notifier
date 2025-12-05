@@ -1,14 +1,8 @@
 /**
  * VL Notifier - Popup Script (Chrome)
  * Settings UI for configuring notification preferences
+ * (DEFAULT_SETTINGS and AUDIO_CONFIG loaded from ../shared/constants.js)
  */
-
-const DEFAULT_SETTINGS = {
-  playSound: false,
-  persistentNotifications: false,
-  soundFrequency: 800,
-  soundDuration: 150
-};
 
 const playSoundEl = document.getElementById("playSound");
 const persistentEl = document.getElementById("persistentNotifications");
@@ -52,7 +46,7 @@ function showStatus(message) {
 }
 
 /**
- * Play test notification sound
+ * Play test notification sound using shared audio config
  */
 function playTestSound() {
   try {
@@ -64,15 +58,18 @@ function playTestSound() {
     gainNode.connect(audioContext.destination);
 
     oscillator.frequency.value = DEFAULT_SETTINGS.soundFrequency;
-    oscillator.type = "sine";
+    oscillator.type = AUDIO_CONFIG.waveType;
 
-    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + DEFAULT_SETTINGS.soundDuration / 1000);
+    gainNode.gain.setValueAtTime(AUDIO_CONFIG.initialGain, audioContext.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(
+      AUDIO_CONFIG.fadeOutFloor,
+      audioContext.currentTime + DEFAULT_SETTINGS.soundDuration / 1000
+    );
 
     oscillator.start(audioContext.currentTime);
     oscillator.stop(audioContext.currentTime + DEFAULT_SETTINGS.soundDuration / 1000);
   } catch (err) {
-    console.error("Failed to play sound:", err);
+    console.error("[VL Notifier] Failed to play sound:", err);
   }
 }
 
@@ -83,7 +80,7 @@ async function testNotification() {
   const notificationOptions = {
     type: "basic",
     iconUrl: "https://www.volumeleaders.com/favicon.png",
-    title: "🔔 TEST touched $123.45",
+    title: "\u{1F514} TEST touched $123.45",
     message: "Rank 1 | Technology | RS: 2.50"
   };
 

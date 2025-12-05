@@ -260,8 +260,6 @@ async function showNotification(item, handler, settings) {
     if (settings.playSound) {
       await playNotificationSound(settings);
     }
-
-    console.log(`[VL Notifier] Notification shown for ${item.Ticker} (${handler.name})`);
   } catch (err) {
     console.error(`[VL Notifier] Failed to show notification:`, err);
   }
@@ -296,7 +294,6 @@ async function processResponse(responseText, handler) {
   }
 
   if (!data.data || !Array.isArray(data.data)) {
-    console.log(`[VL Notifier] No data array in response (${handler.name})`);
     return;
   }
 
@@ -315,15 +312,12 @@ async function processResponse(responseText, handler) {
     const newItems = [];
     const updatedSeenItems = { ...seenItems };
 
-    console.log(`[VL Notifier] Processing ${items.length} items, ${Object.keys(seenItems).length} already seen`);
-
     for (const item of items) {
       const key = handler.getItemKey(item);
       if (!seenItems[key]) {
         updatedSeenItems[key] = true;
         if (isInitialized) {
           newItems.push(item);
-          console.log(`[VL Notifier] NEW: ${key}`);
         }
       }
     }
@@ -333,14 +327,6 @@ async function processResponse(responseText, handler) {
       [storageKey]: updatedSeenItems,
       [initializedKey]: true
     });
-
-    if (newItems.length > 0) {
-      console.log(`[VL Notifier] Found ${newItems.length} new items (${handler.name})`);
-    } else if (!isInitialized) {
-      console.log(`[VL Notifier] Initial seed complete - ${items.length} items stored (${handler.name})`);
-    } else {
-      console.log(`[VL Notifier] No new items (${handler.name})`);
-    }
 
     releaseLock();
 
@@ -393,7 +379,6 @@ async function cleanupOldStorage() {
 
   if (keysToRemove.length > 0) {
     await chrome.storage.local.remove(keysToRemove);
-    console.log(`[VL Notifier] Cleaned up ${keysToRemove.length} old storage entries`);
   }
 }
 
@@ -437,9 +422,7 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
       const storageKey = `${handler.storagePrefix}_${todayKey}`;
       const initializedKey = `${handler.storagePrefix}_initialized_${todayKey}`;
 
-      chrome.storage.local.remove([storageKey, initializedKey]).then(() => {
-        console.log(`[VL Notifier] Page load detected - reset state for ${handler.name}`);
-      });
+      chrome.storage.local.remove([storageKey, initializedKey]);
     }
   }
 });
@@ -512,9 +495,6 @@ async function initialize() {
   // Clean up legacy non-date-scoped keys
   const legacyKeys = ALL_STORAGE_PREFIXES.map(p => `${p}_initialized`);
   await chrome.storage.local.remove(legacyKeys);
-
-  const pages = Object.values(PAGE_HANDLERS).map(h => h.name).join(", ");
-  console.log(`[VL Notifier] Service worker loaded - monitoring: ${pages}`);
 }
 
 initialize().catch(err => {

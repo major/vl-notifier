@@ -11,7 +11,7 @@ Options:
   -h, --help         Show this help message
   -f, --firefox      Build Firefox extension only
   -c, --chrome       Build Chrome extension only
-  -s, --sign         Build and sign Firefox extension (requires Mozilla API credentials)
+  --sign-firefox     Build and sign Firefox extension (requires Mozilla API credentials)
   --sign-chrome      Build signed Chrome .crx file (requires private key)
   (no option)        Build both Firefox and Chrome extensions
 
@@ -144,7 +144,7 @@ case "${1:-}" in
     -c|--chrome)
         build_chrome
         ;;
-    -s|--sign)
+    --sign-firefox)
         build_signed
         ;;
     --sign-chrome)

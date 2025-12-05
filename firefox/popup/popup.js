@@ -1,13 +1,8 @@
 /**
  * VL Notifier - Popup Script
  * Settings UI for configuring notification preferences
+ * (DEFAULT_SETTINGS loaded from ../shared/constants.js)
  */
-
-const DEFAULT_SETTINGS = {
-  playSound: false,
-  soundFrequency: 800,
-  soundDuration: 150
-};
 
 const playSoundEl = document.getElementById("playSound");
 const testBtn = document.getElementById("testBtn");
@@ -19,7 +14,6 @@ const statusEl = document.getElementById("status");
 async function loadSettings() {
   const stored = await browser.storage.local.get("settings");
   const settings = { ...DEFAULT_SETTINGS, ...stored.settings };
-
   playSoundEl.checked = settings.playSound;
 }
 
@@ -48,45 +42,21 @@ function showStatus(message) {
 }
 
 /**
- * Play test notification sound
- */
-function playTestSound() {
-  try {
-    const audioContext = new AudioContext();
-    const oscillator = audioContext.createOscillator();
-    const gainNode = audioContext.createGain();
-
-    oscillator.connect(gainNode);
-    gainNode.connect(audioContext.destination);
-
-    oscillator.frequency.value = DEFAULT_SETTINGS.soundFrequency;
-    oscillator.type = "sine";
-
-    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + DEFAULT_SETTINGS.soundDuration / 1000);
-
-    oscillator.start(audioContext.currentTime);
-    oscillator.stop(audioContext.currentTime + DEFAULT_SETTINGS.soundDuration / 1000);
-  } catch (err) {
-    console.error("Failed to play sound:", err);
-  }
-}
-
-/**
- * Send test notification
+ * Send test notification and optionally play sound via background script
  */
 async function testNotification() {
   const notificationOptions = {
     type: "basic",
     iconUrl: "https://www.volumeleaders.com/favicon.png",
-    title: "🔔 TEST touched $123.45",
+    title: "\u{1F514} TEST touched $123.45",
     message: "Rank 1 | Technology | RS: 2.50"
   };
 
   await browser.notifications.create(`test-${Date.now()}`, notificationOptions);
 
   if (playSoundEl.checked) {
-    playTestSound();
+    // Use background script's audio playback (single source of truth)
+    browser.runtime.sendMessage({ action: "playSound" });
   }
 
   showStatus("Test notification sent!");

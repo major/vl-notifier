@@ -30,5 +30,3 @@ window.addEventListener('message', (event) => {
     }
   });
 });
-
-console.log('[VL Notifier] Content script loaded');

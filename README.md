@@ -16,7 +16,7 @@ Browser extensions that monitor [VolumeLeaders.com](https://www.volumeleaders.co
   - Trade type indicators (🔶 DP Sweep, 🟠 DP Trade, 🔷 Lit Sweep, 🔵 Lit Trade)
 - **Configurable settings:**
   - Optional sound alerts
-  - Persistent notifications (stay until dismissed)
+  - Persistent notifications (Chrome only - Firefox doesn't support this)
 - Smart tracking to avoid duplicate notifications
 - Automatic cleanup of old data
 
@@ -30,11 +30,16 @@ Browser extensions that monitor [VolumeLeaders.com](https://www.volumeleaders.co
 3. Click the gear icon → "Install Add-on From File..."
 4. Select the downloaded `.zip` file
 
-#### Developer Install (Temporary)
+#### Developer Install
 1. Clone this repository
-2. Go to `about:debugging#/runtime/this-firefox`
-3. Click "Load Temporary Add-on..."
-4. Select `firefox/manifest.json`
+2. Run `npm install` then `npm run start` (or `make dev`)
+   - This launches Firefox with the extension auto-loaded and hot-reloading
+
+**Alternative (temporary install):**
+1. Go to `about:debugging#/runtime/this-firefox`
+2. Click "Load Temporary Add-on..."
+3. Select `firefox/manifest.json`
+4. ⚠️ Extension is removed when Firefox closes
 
 ### Chrome
 
@@ -64,7 +69,7 @@ Click the extension icon in the toolbar to access settings:
 | Setting | Description |
 |---------|-------------|
 | **Play Sound** | Enable audio alerts for new items |
-| **Persistent Notifications** | Notifications stay visible until dismissed |
+| **Persistent Notifications** | Notifications stay visible until dismissed (Chrome only) |
 
 Use the "Test Notification" button to preview your settings.
 
@@ -107,7 +112,7 @@ Output goes to `web-ext-artifacts/`:
 ```bash
 export WEB_EXT_API_KEY='your-jwt-issuer'
 export WEB_EXT_API_SECRET='your-jwt-secret'
-./build.sh -s
+./build.sh --sign-firefox
 ```
 Get credentials at: https://addons.mozilla.org/en-US/developers/addon/api/key/
 

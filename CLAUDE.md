@@ -7,7 +7,7 @@ Browser extension (Firefox MV2 + Chrome MV3) that monitors VolumeLeaders.com API
 ./build.sh              # Build both Firefox + Chrome
 ./build.sh -f           # Firefox only
 ./build.sh -c           # Chrome only
-./build.sh -s           # Sign Firefox (requires Mozilla API creds)
+./build.sh --sign-firefox  # Sign Firefox (requires Mozilla API creds)
 ./build.sh --sign-chrome # Sign Chrome .crx (requires private key)
 npm run start           # Dev: hot reload Firefox
 npm run lint            # Lint Firefox
@@ -19,7 +19,7 @@ npm run lint            # Lint Firefox
 
 ### Firefox (`firefox/`)
 - `background.js` - Intercepts XHR via `webRequest.filterResponseData`, tracks seen items in `browser.storage.local`, fires notifications
-- `popup/` - Settings UI (sound, persistent notifications)
+- `popup/` - Settings UI (sound toggle)
 - `manifest.json` - MV2 with `webRequest`, `webRequestBlocking`, `storage`, `notifications`
 
 ### Chrome (`chrome/`)

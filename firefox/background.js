@@ -183,15 +183,8 @@ async function acquireLock(handlerKey) {
 }
 
 // ============================================================================
-// SETTINGS
+// SETTINGS (DEFAULT_SETTINGS loaded from shared/constants.js)
 // ============================================================================
-
-/** Default settings */
-const DEFAULT_SETTINGS = {
-  playSound: false,
-  soundFrequency: 800,
-  soundDuration: 150
-};
 
 /** Cached settings */
 let settings = { ...DEFAULT_SETTINGS };
@@ -207,8 +200,13 @@ async function loadSettings() {
 
 /**
  * Play a notification sound using Web Audio API
+ * @param {number} [frequency] - Override frequency (Hz), defaults to settings
+ * @param {number} [duration] - Override duration (ms), defaults to settings
  */
-function playNotificationSound() {
+function playNotificationSound(frequency, duration) {
+  const freq = frequency ?? settings.soundFrequency;
+  const dur = duration ?? settings.soundDuration;
+
   try {
     const audioContext = new AudioContext();
     const oscillator = audioContext.createOscillator();
@@ -217,15 +215,15 @@ function playNotificationSound() {
     oscillator.connect(gainNode);
     gainNode.connect(audioContext.destination);
 
-    oscillator.frequency.value = settings.soundFrequency;
-    oscillator.type = "sine";
+    oscillator.frequency.value = freq;
+    oscillator.type = AUDIO_CONFIG.waveType;
 
     // Fade out to avoid click
-    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + settings.soundDuration / 1000);
+    gainNode.gain.setValueAtTime(AUDIO_CONFIG.initialGain, audioContext.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(AUDIO_CONFIG.fadeOutFloor, audioContext.currentTime + dur / 1000);
 
     oscillator.start(audioContext.currentTime);
-    oscillator.stop(audioContext.currentTime + settings.soundDuration / 1000);
+    oscillator.stop(audioContext.currentTime + dur / 1000);
   } catch (err) {
     console.error("[VL Notifier] Failed to play sound:", err);
   }
@@ -262,8 +260,6 @@ async function showNotification(item, handler) {
     if (settings.playSound) {
       playNotificationSound();
     }
-
-    console.log(`[VL Notifier] Notification shown for ${item.Ticker} (${handler.name})`);
   } catch (err) {
     console.error(`[VL Notifier] Failed to show notification:`, err);
   }
@@ -284,7 +280,6 @@ async function processResponse(responseText, handler) {
   }
 
   if (!data.data || !Array.isArray(data.data)) {
-    console.log(`[VL Notifier] No data array in response (${handler.name})`);
     return;
   }
 
@@ -308,16 +303,12 @@ async function processResponse(responseText, handler) {
     const newItems = [];
     const updatedSeenItems = { ...seenItems };
 
-    console.log(`[VL Notifier] Processing ${items.length} items, ${Object.keys(seenItems).length} already seen`);
-
     for (const item of items) {
       const key = handler.getItemKey(item);
       if (!seenItems[key]) {
         updatedSeenItems[key] = true;
         if (isInitialized) {
-          // Only notify if we've already seeded the storage
           newItems.push(item);
-          console.log(`[VL Notifier] NEW: ${key}`);
         }
       }
     }
@@ -329,15 +320,6 @@ async function processResponse(responseText, handler) {
       [initializedKey]: true
     });
 
-    // Log status
-    if (newItems.length > 0) {
-      console.log(`[VL Notifier] Found ${newItems.length} new items (${handler.name})`);
-    } else if (!isInitialized) {
-      console.log(`[VL Notifier] Initial seed complete - ${items.length} items stored (${handler.name})`);
-    } else {
-      console.log(`[VL Notifier] No new items (${handler.name})`);
-    }
-
     // Release lock BEFORE showing notifications (storage is already updated)
     releaseLock();
 
@@ -346,7 +328,7 @@ async function processResponse(responseText, handler) {
       for (let i = 0; i < newItems.length; i++) {
         // Small delay between notifications (200ms)
         if (i > 0) {
-          await new Promise(resolve => setTimeout(resolve, 200));
+          await new Promise(resolve => setTimeout(resolve, TIMING.notificationDelay));
         }
         await showNotification(newItems[i], handler);
       }
@@ -367,7 +349,7 @@ async function cleanupOldStorage() {
   // Parse today's date
   const today = new Date();
   const twoDaysAgo = new Date(today);
-  twoDaysAgo.setDate(today.getDate() - 2);
+  twoDaysAgo.setDate(today.getDate() - TIMING.storageCleanupDays);
 
   const keysToRemove = [];
 
@@ -390,7 +372,6 @@ async function cleanupOldStorage() {
 
   if (keysToRemove.length > 0) {
     await browser.storage.local.remove(keysToRemove);
-    console.log(`[VL Notifier] Cleaned up ${keysToRemove.length} old storage entries`);
   }
 }
 
@@ -549,8 +530,6 @@ browser.webNavigation.onCompleted.addListener(async (details) => {
   // Clear the initialized flag and seen items for this handler
   // This forces the first XHR to re-seed the list
   await browser.storage.local.remove([storageKey, initializedKey]);
-
-  console.log(`[VL Notifier] Page refresh detected - reset state for ${handler.name}`);
 });
 
 // ============================================================================
@@ -566,17 +545,22 @@ async function initialize() {
   const legacyKeys = ALL_STORAGE_PREFIXES.map(p => `${p}_initialized`);
   await browser.storage.local.remove(legacyKeys);
 
-  // Log supported pages
-  const pages = Object.values(PAGE_HANDLERS).map(h => h.name).join(", ");
-  console.log(`[VL Notifier] Extension loaded - monitoring: ${pages}`);
-  console.log("[VL Notifier] Settings:", settings);
 }
 
 // Listen for settings changes from popup
 browser.storage.onChanged.addListener((changes, areaName) => {
   if (areaName === "local" && changes.settings) {
     settings = { ...DEFAULT_SETTINGS, ...changes.settings.newValue };
-    console.log("[VL Notifier] Settings updated:", settings);
+  }
+});
+
+// Listen for messages from popup (e.g., test sound)
+browser.runtime.onMessage.addListener((message) => {
+  if (message.action === "playSound") {
+    playNotificationSound(
+      message.frequency ?? DEFAULT_SETTINGS.soundFrequency,
+      message.duration ?? DEFAULT_SETTINGS.soundDuration
+    );
   }
 });
 

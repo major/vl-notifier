@@ -74,6 +74,4 @@
 
     return originalXHRSend.apply(this, args);
   };
-
-  console.log('[VL Notifier] XHR/fetch interceptors installed');
 })();

@@ -36,5 +36,3 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
   return false;
 });
-
-console.log('[VL Notifier] Offscreen document ready');
