@@ -1,4 +1,4 @@
-.PHONY: build build-firefox build-chrome sign-firefox sign-chrome release dev lint clean help
+.PHONY: build build-firefox build-chrome sign-firefox sign-chrome dev lint clean help
 
 # Default target
 help:
@@ -18,8 +18,7 @@ help:
 	@echo "  make lint           Lint Firefox extension"
 	@echo "  make clean          Remove build artifacts"
 	@echo ""
-	@echo "Release:"
-	@echo "  make release VERSION=1.3  Bump version, commit, and tag"
+	@echo "For releases, use: npm run release:patch|minor|major"
 	@echo ""
 
 # Build targets
@@ -49,8 +48,3 @@ lint:
 # Cleanup
 clean:
 	rm -rf web-ext-artifacts/
-
-# Release automation
-release:
-	@test -n "$(VERSION)" || (echo "❌ Usage: make release VERSION=1.3" && exit 1)
-	./bump.sh $(VERSION)

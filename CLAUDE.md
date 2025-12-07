@@ -4,22 +4,33 @@ Browser extension (Firefox MV2 + Chrome MV3) that monitors VolumeLeaders.com API
 
 ## Commands
 ```bash
+# Build
 ./build.sh              # Build both Firefox + Chrome
 ./build.sh -f           # Firefox only
 ./build.sh -c           # Chrome only
+make build              # Build both (Makefile shortcut)
+make clean              # Remove build artifacts
+
+# Sign
 ./build.sh --sign-firefox  # Sign Firefox (requires Mozilla API creds)
-./build.sh --sign-chrome # Sign Chrome .crx (requires private key)
+./build.sh --sign-chrome   # Sign Chrome .crx (requires private key)
+make sign-firefox       # Sign Firefox (Makefile shortcut)
+make sign-chrome        # Sign Chrome (Makefile shortcut)
+
+# Development
 npm run start           # Dev: hot reload Firefox
+make dev                # Same as above (Makefile shortcut)
 npm run lint            # Lint Firefox
+make lint               # Same as above (Makefile shortcut)
 
 # Releases (via release-it)
 npm run release         # Interactive release
-npm run release:patch   # Bump patch version
-npm run release:minor   # Bump minor version
-npm run release:major   # Bump major version
+npm run release:patch   # Bump patch version (1.0.7 → 1.0.8)
+npm run release:minor   # Bump minor version (1.0.7 → 1.1.0)
+npm run release:major   # Bump major version (1.0.7 → 2.0.0)
 ```
 
-**Release:** `npm run release:patch` bumps version in all manifests, commits, tags, pushes → GitHub Actions builds + signs + publishes
+**Release:** `npm run release:patch` bumps version in all manifests, commits, tags, pushes tag → GitHub Actions builds + signs + publishes release
 
 ## Architecture
 
