@@ -9,12 +9,10 @@
   "github": {
     "release": false
   },
-  "npm": {
-    "publish": false,
-    "version": false
-  },
+  "npm": false,
   "plugins": {
     "@release-it/bumper": {
+      "in": { "file": "package.json", "path": "version" },
       "out": [
         { "file": "package.json", "path": "version" },
         { "file": "firefox/manifest.json", "path": "version" },
