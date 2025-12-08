@@ -8,6 +8,7 @@ const playSoundEl = document.getElementById("playSound");
 const persistentEl = document.getElementById("persistentNotifications");
 const testBtn = document.getElementById("testBtn");
 const statusEl = document.getElementById("status");
+const versionEl = document.getElementById("version");
 
 /**
  * Load settings from storage and update UI
@@ -103,4 +104,5 @@ persistentEl.addEventListener("change", saveSettings);
 testBtn.addEventListener("click", testNotification);
 
 // Initialize
+versionEl.textContent = `v${chrome.runtime.getManifest().version}`;
 loadSettings();

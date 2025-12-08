@@ -7,6 +7,7 @@
 const playSoundEl = document.getElementById("playSound");
 const testBtn = document.getElementById("testBtn");
 const statusEl = document.getElementById("status");
+const versionEl = document.getElementById("version");
 
 /**
  * Load settings from storage and update UI
@@ -67,4 +68,5 @@ playSoundEl.addEventListener("change", saveSettings);
 testBtn.addEventListener("click", testNotification);
 
 // Initialize
+versionEl.textContent = `v${browser.runtime.getManifest().version}`;
 loadSettings();
