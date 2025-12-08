@@ -421,6 +421,19 @@ function isChartPage(url) {
 }
 
 /**
+ * Check if a request is from a chart page by examining POST body.
+ * Chart page requests have Sort=Dollars parameter, main trades page does not.
+ * @param {Object} requestBody - The request body from webRequest details
+ * @returns {boolean} True if the request appears to be from a chart page
+ */
+function isChartPageRequest(requestBody) {
+  if (!requestBody?.formData) return false;
+  // Chart pages request trades sorted by Dollars
+  const sortParam = requestBody.formData.Sort;
+  return sortParam && sortParam.includes('Dollars');
+}
+
+/**
  * Set up the XHR interceptor using webRequest.filterResponseData
  * Monitors all registered URL patterns
  */
@@ -436,11 +449,19 @@ browser.webRequest.onBeforeRequest.addListener(
     // Check if request is from a chart page - skip notifications there
     // Chart pages make filtered API calls that would spam notifications
     let skipProcessing = false;
-    if (details.tabId && details.tabId >= 0) {
+
+    // Primary check: examine POST body for Sort=Dollars (chart page indicator)
+    if (isChartPageRequest(details.requestBody)) {
+      console.log(`[VL Notifier] Skipping ${handler.name} - chart page request (Sort=Dollars)`);
+      skipProcessing = true;
+    }
+
+    // Fallback check: examine tab URL
+    if (!skipProcessing && details.tabId && details.tabId >= 0) {
       try {
         const tab = await browser.tabs.get(details.tabId);
         if (isChartPage(tab.url)) {
-          console.log(`[VL Notifier] Skipping ${handler.name} - request from chart page`);
+          console.log(`[VL Notifier] Skipping ${handler.name} - request from chart page URL`);
           skipProcessing = true;
         }
       } catch (e) {
@@ -480,7 +501,7 @@ browser.webRequest.onBeforeRequest.addListener(
     return {};
   },
   { urls: ALL_URL_PATTERNS },
-  ["blocking"]
+  ["blocking", "requestBody"]
 );
 
 // ============================================================================
