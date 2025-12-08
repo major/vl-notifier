@@ -10,7 +10,8 @@
     "release": false
   },
   "npm": {
-    "publish": false
+    "publish": false,
+    "version": false
   },
   "plugins": {
     "@release-it/bumper": {
