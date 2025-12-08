@@ -120,10 +120,12 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
+          name: v${{ steps.version.outputs.version }}
           files: |
             vl-notifier-firefox-${{ steps.version.outputs.version }}.zip
             vl-notifier-firefox-${{ steps.version.outputs.version }}.xpi
             vl-notifier-chrome-${{ steps.version.outputs.version }}.zip
+          # Auto-generate changelog from commits since last release
           generate_release_notes: true
           draft: false
           prerelease: false
