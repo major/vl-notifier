@@ -132,7 +132,7 @@ const PAGE_HANDLERS = {
       const sectorParts = [item.Sector];
       if (item.Industry) sectorParts.push(item.Industry);
       return {
-        title: `[VL] 🔔 ${item.Ticker}${rank} touched ${formatPrice(item.Price)}`,
+        title: `[VL] 🔔 ${item.Ticker} touched ${rank} ${formatPrice(item.Price)}`,
         message: `${daysStr}RS ${rs}x | PCT ${pct}\n${sectorParts.join(' | ')}`
       };
     }
