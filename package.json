@@ -18,6 +18,6 @@
   "devDependencies": {
     "@release-it/bumper": "^7.0.5",
     "release-it": "^19.0.6",
-    "web-ext": "^9.2.0"
+    "web-ext": "^10.0.0"
   }
 }
