@@ -118,7 +118,7 @@ jobs:
           name: vl-notifier-chrome-${{ steps.version.outputs.version }}
 
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@b4309332981a82ec1c5618f44dd2e27cc8bfbfda # v3
         with:
           name: v${{ steps.version.outputs.version }}
           files: |
