@@ -17,7 +17,7 @@
   },
   "devDependencies": {
     "@release-it/bumper": "7.0.5",
-    "release-it": "20.0.0",
+    "release-it": "20.0.1",
     "web-ext": "10.1.0"
   }
 }
